@@ -490,7 +490,7 @@ function prepareGraph(graphData, graphClass) {
 		.attr("class", "inner-circle")
 		.attr("fill", "#36454f")
 		.text(function (d) {
-			return 'each colour for details!';
+			return 'graph for details';
 		});
 }
 
