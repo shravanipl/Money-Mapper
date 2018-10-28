@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -17,7 +17,7 @@
 <body>
     <div class="row">
         <div class="col-6">
-            <header>
+            <header role="banner">
                 <h1>Money Mapper</h1>
                 <ul class="nav">
                     <li><a href="#" class="homeTab">Home</a></li>
@@ -31,7 +31,7 @@
                         <li><a href="#stats">Stats</a></li>
                     </ul>
                     <div id="monthly">
-                        <h2>View your expenses on Monthly Basis</h2>
+                        <h2>View your expenses on Monthly Basis for current year</h2>
                         <label for="month">Select month</label>
                         <select id="month" required>
                             <option value="">Please select</option>
@@ -48,7 +48,6 @@
                             <option value="Nov">November</option>
                             <option value="Dec">December</option>
                         </select>
-                        <span class="year">new Date().getFullYear()</span>
                         <div class="col-sm-12" style="padding:0px;">
                             <div class="card card1">
                                 <div class="card-block">
@@ -57,7 +56,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="graphData svg-container monthlyInfo">
+                        <div class="graphData monthlyInfo">
                         </div>
                     </div>
                     <div id="daily">
@@ -77,13 +76,13 @@
                     </div>
                     <div id="stats">
                         <h2>Total Expenses for current year</h2>
-                        <div class="totalExpenseGraph totalInfo"></div>
+                        <div class="totalExpenseGraph totalInfo">
+                        </div>
                         <div class="barGraph"></div>
                     </div>
-
             </header>
-            <main id="main">
-                <div class="signin">
+            <main id="main" role="main">
+                <section class="signin">
                     <form>
                         <label for="uname">User Name</label>
                         <input type="text" class="text uname" name="uname" required>
@@ -93,7 +92,7 @@
                         <button type="button" class="submit snip1582 js-signin">Sign In</button>
                         <a href="#" id="new-account">Click to create new account</a>
                     </form>
-                </div>
+                </section>
                 <div id="new-account">
                     <form class="signup">
                         <label for="name">Name</label><br>
@@ -112,7 +111,7 @@
                 </div>
                 <div class="home">
                     <h2 class="formTitle">Enter your expenses</h2>
-                    <div class="expenseFields">
+                    <section class="expenseFields">
                         <form class="expenseForm expenses">
                             <label for="date">Date</label><br><br>
                             <input type="text" class="input date" id="datepicker" name="date" required><br><br>
@@ -134,7 +133,7 @@
                             <input type="number" class="input amount" name="amount" required>
                             <button type="submit" class="js-expense expense">Add Expense</button>
                         </form>
-                    </div>
+                    </section>
                     <div class="expenseDetails"></div>
                     <div id="dialog-form" title="Update Expense">
                         <form class="modal">

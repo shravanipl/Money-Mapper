@@ -98,8 +98,8 @@ function createExpenseTable(expenseData) {
               <td>${expense.expenseInfo}</td>
               <td>${expense.category}</td>
               <td>${expense.amount}</td>
-			  <td><button class="edit-btn js-edit"><i class="fa fa-edit" aria-hidden="true"></i></button></td> 
-              <td><button class ="delete-btn js-delete"><i class ="fa fa-trash-o" aria-hidden ="true"></i></button></td>
+			  <td><button class="edit-btn js-edit"><i class="fa fa-edit" aria-hidden="true"></i>Edit</button></td> 
+              <td><button class ="delete-btn js-delete"><i class ="fa fa-trash-o" aria-hidden ="true"></i>Delete</button></td>
       </tr>`;
 	});
 	let expenseHeader = `<thead><tr>
@@ -474,6 +474,23 @@ function prepareGraph(graphData, graphClass) {
 		})
 		.attr('fill', function (d, i) {
 			return color(d.data.Name);
+		});
+	
+	svg.append("text")
+		.attr("dy", "-0.5em")
+		.style("text-anchor", "middle")
+		.attr("class", "inner-circle")
+		.attr("fill", "#36454f")
+		.text(function (d) {
+			return 'Hover on';
+		});
+	svg.append("text")
+		.attr("dy", "1.0em")
+		.style("text-anchor", "middle")
+		.attr("class", "inner-circle")
+		.attr("fill", "#36454f")
+		.text(function (d) {
+			return 'each colour for details!';
 		});
 }
 
