@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html lang="en">
 
 <head>
     <title>Money Mapper</title>
@@ -10,157 +10,165 @@
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
         crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">
     <link rel="stylesheet" href="index.css" type="text/css" />
 </head>
 
 <body>
-    <header role="banner">
-        <h1>Money mapper</h1>
-        <ul class="nav">
-            <li><a href="#" class="homeTab">Home</a></li>
-            <li><a href="#tabs" class="graph">Graph</a> </li>
-            <li><a href="#" class="signout">SignOut</a></li>
-        </ul>
-        <div id="tabs">
-            <ul>
-                <li><a href="#monthly">Monthly</a></li>
-                <li><a href="#daily">Daily</a></li>
-                <li><a href="#stats">Stats</a></li>
-            </ul>
-            <div id="monthly">
-                <h2>View your expenses on Monthly Basis</h2>
-                <label for="month">Select month</label>
-                <select id="month" required>
-                    <option value="">Please select</option>
-                    <option value="Jan">January</option>
-                    <option value="Feb">Febraury</option>
-                    <option value="Mar">March</option>
-                    <option value="Apr">April</option>
-                    <option value="May">May</option>
-                    <option value="Jun">June</option>
-                    <option value="Jul">July</option>
-                    <option value="Aug">August</option>
-                    <option value="Sep">September</option>
-                    <option value="Oct">October</option>
-                    <option value="Nov">November</option>
-                    <option value="Dec">December</option>
-                </select>
-                <!--To do change the implementation for Current year-->
-                <script type="text/javascript">
-                    document.write(new Date().getFullYear());
-                </script>
-
-                <div class="col-sm-12" style="padding:0px;">
-                    <div class="card card1">
-                        <div class="card-block">
-                            <h3 class="card-title">Total Money Spent<i class="fa fa-money float-right"></i></h3>
-                            <p class="card-text monthlyTotal"><i class="fa fa-currency" aria-hidden="true"></i></p>
+    <div class="row">
+        <div class="col-6">
+            <header>
+                <h1>Money Mapper</h1>
+                <ul class="nav">
+                    <li><a href="#" class="homeTab">Home</a></li>
+                    <li><a href="#tabs" class="graph">Graph</a> </li>
+                    <li><a href="#" class="signout">SignOut</a></li>
+                </ul>
+                <div id="tabs">
+                    <ul>
+                        <li><a href="#monthly">Monthly</a></li>
+                        <li><a href="#daily">Daily</a></li>
+                        <li><a href="#stats">Stats</a></li>
+                    </ul>
+                    <div id="monthly">
+                        <h2>View your expenses on Monthly Basis</h2>
+                        <label for="month">Select month</label>
+                        <select id="month" required>
+                            <option value="">Please select</option>
+                            <option value="Jan">January</option>
+                            <option value="Feb">Febraury</option>
+                            <option value="Mar">March</option>
+                            <option value="Apr">April</option>
+                            <option value="May">May</option>
+                            <option value="Jun">June</option>
+                            <option value="Jul">July</option>
+                            <option value="Aug">August</option>
+                            <option value="Sep">September</option>
+                            <option value="Oct">October</option>
+                            <option value="Nov">November</option>
+                            <option value="Dec">December</option>
+                        </select>
+                        <span class="year">new Date().getFullYear()</span>
+                        <div class="col-sm-12" style="padding:0px;">
+                            <div class="card card1">
+                                <div class="card-block">
+                                    <h3 class="card-title">Total Money Spent<i class="fa fa-money float-right"></i></h3>
+                                    <p class="card-text monthlyTotal"><i class="fa fa-currency" aria-hidden="true"></i></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="graphData svg-container monthlyInfo">
                         </div>
                     </div>
-                </div>
-                <div class="graphData">
-                </div>
-            </div>
-            <div id="daily">
-                <h2>Today's Expenses Report</h2>
-                <div class="col-sm-12" style="padding: 0px;">
-                    <div class="card card1">
-                        <div class="card-block">
-                            <h3 class="card-title">Total Money Spent <i class="fa fa-money float-right"></i></h3>
-                            <p class="card-text dailyTotal"><i class="fa fa-rupee" aria-hidden="true"></i>236</p>
+                    <div id="daily">
+                        <h2>View the expense for a particular day</h2>
+                        <label for="date">Select date</label><br><br>
+                        <input type="text" class="input day" id="datepicker2" name="date" required><br><br>
+                        <div class="col-sm-12" style="padding: 0px;">
+                            <div class="card card2">
+                                <div class="card-block">
+                                    <h3 class="card-title">Total Money Spent <i class="fa fa-money float-right"></i></h3>
+                                    <p class="card-text dailyTotal"><i class="fa fa-currency" aria-hidden="true"></i></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dailyGraphData dailyInfo">
                         </div>
                     </div>
-                </div>
-                <div class="dailyGraphData">
-                </div>
-            </div>
-            <div id="stats">
-                <h2>Total Expense till date</h2>
-                <div class="totalExpenseGraph"></div>
-                <div class="barGraph"></div>
-            </div>
+                    <div id="stats">
+                        <h2>Total Expenses for current year</h2>
+                        <div class="totalExpenseGraph totalInfo"></div>
+                        <div class="barGraph"></div>
+                    </div>
 
-    </header>
-    <main id="main">
-        <div class="signin">
-            <form>
-                <label for="uname">User Name</label>
-                <input type="text" class="text uname" name="uname" required>
-                <label for="pwd">Password</label>
-                <input type="password" class="text pwd" name="pwd" required>
-                <button type="button" class="submit js-signin">Sign In</button>
-                <a href="#" id="new-account">Click to create new account</a>
-                <div class="error"></div>
-            </form>
-        </div>
-        <div id="new-account">
-            <form class="signup">
-                <label for="name">Name</label><br>
-                <input type="text" class="text name" name="name" required><br><br>
-                <label for="email">Email</label><br>
-                <input type="email" class="text email" name="email" required><br><br>
-                <label for="username">User Name</label><br>
-                <input type="text" class="text username" name="username" required><br><br>
-                <label for="password">Password</label><br>
-                <input type="password" class="text password" name="password" required><br><br>
-                <button type="submit" class="submit js-create-account">Create Account</button><br>
-            </form>
-        </div>
-        <div class="home">
-            <h2 class="formTitle">Enter your expenses</h2>
-            <section class="expenses">
-                <label for="date">Date</label><br><br>
-                <input type="text" class="input date" id="datepicker" name="date" required><br><br>
-                <label for="info">Expense Info</label><br>
-                <input type="text" class="input info" name="info" required><br><br>
-                <label for="category">Select Category</label><br><br>
-                <select id="category" class="input" required>
-                    <option value="">Please Select</option>
-                    <option value="1">Restaurants</option>
-                    <option value="2">Fuel</option>
-                    <option value="3">Groceries</option>
-                    <option value="4">Bills</option>
-                    <option value="5">Vacation</option>
-                    <option value="6">Shopping</option>
-                    <option value="7">Entertainment</option>
-                    <option value="8">Miscellaneous</option>
-                </select>
-                <label for="amount">Amount</label> <br><br>
-                <input type="number" class="input amount" name="amount" required>
-                <button type="button" class="js-expense expense">Add Expense</button>
-            </section>
-            <div class="expenseDetails"></div>
-            <div id="dialog-form" title="Update Expense">
-                <form class="modal">
-                    <label for="info">Expense Info</label>
-                    <input type="text" class="uinfo utext" name="info" required>
-                    <label for="date">Date</label>
-                    <input type="text" class="udate utext" id="datepicker1" name="date" required>
-                    <label for="category">Select Category</label>
-                    <select id="ucategory" required>
-                        <option value="">Please Select</option>
-                        <option value="1">Restaurants</option>
-                        <option value="2">Fuel</option>
-                        <option value="3">Groceries</option>
-                        <option value="4">Bills</option>
-                        <option value="5">Vacation</option>
-                        <option value="6">Shopping</option>
-                        <option value="7">Entertainment</option>
-                        <option value="8">Miscellaneous</option>
-                    </select>
-                    <label for="amount" class="amt">Amount</label>
-                    <input type="number" class="uamount utext" name="amount" required>
-                    <input type="submit" class="update utext" tabindex="-1">
+            </header>
+            <main id="main">
+                <div class="signin">
+                    <form>
+                        <label for="uname">User Name</label>
+                        <input type="text" class="text uname" name="uname" required>
+                        <label for="pwd">Password</label>
+                        <input type="password" class="text pwd" name="pwd" required>
+                        <div class="error"></div>
+                        <button type="button" class="submit snip1582 js-signin">Sign In</button>
+                        <a href="#" id="new-account">Click to create new account</a>
+                    </form>
+                </div>
+                <div id="new-account">
+                    <form class="signup">
+                        <label for="name">Name</label><br>
+                        <input type="text" class="text name" name="name" required><br><br>
+                        <label for="email">Email</label><br>
+                        <input type="email" class="text email" name="email" required><br><br>
+                        <label for="username">User Name</label><br>
+                        <input type="text" class="text username" name="username" pattern=".{4,}" title="Minimum 4 characters required"
+                            required><br><br>
+                        <div class="error1"></div>
+                        <label for="password">Password</label><br>
+                        <input type="password" class="text password" name="password" pattern=".{5,}" title="Minimum 5 characters required"
+                            required><br><br>
+                        <button type="submit" class="submit js-create-account">Create Account</button><br>
+                    </form>
+                </div>
+                <div class="home">
+                    <h2 class="formTitle">Enter your expenses</h2>
+                    <div class="expenseFields">
+                        <form class="expenseForm expenses">
+                            <label for="date">Date</label><br><br>
+                            <input type="text" class="input date" id="datepicker" name="date" required><br><br>
+                            <label for="info">Expense Info</label><br>
+                            <input type="text" class="input info" name="info" required><br><br>
+                            <label for="category">Select Category</label><br><br>
+                            <select id="category" class="input" required>
+                                <option value="">Please Select</option>
+                                <option value="1">Restaurants</option>
+                                <option value="2">Fuel</option>
+                                <option value="3">Groceries</option>
+                                <option value="4">Bills</option>
+                                <option value="5">Vacation</option>
+                                <option value="6">Shopping</option>
+                                <option value="7">Entertainment</option>
+                                <option value="8">Miscellaneous</option>
+                            </select>
+                            <label for="amount">Amount</label> <br><br>
+                            <input type="number" class="input amount" name="amount" required>
+                            <button type="submit" class="js-expense expense">Add Expense</button>
+                        </form>
+                    </div>
+                    <div class="expenseDetails"></div>
+                    <div id="dialog-form" title="Update Expense">
+                        <form class="modal">
+                            <label for="info">Expense Info</label>
+                            <input type="text" class="uinfo utext" name="info" required>
+                            <label for="date">Date</label>
+                            <input type="text" class="udate utext" id="datepicker1" name="date" required>
+                            <label for="category">Select Category</label>
+                            <select id="ucategory" required>
+                                <option value="">Please Select</option>
+                                <option value="1">Restaurants</option>
+                                <option value="2">Fuel</option>
+                                <option value="3">Groceries</option>
+                                <option value="4">Bills</option>
+                                <option value="5">Vacation</option>
+                                <option value="6">Shopping</option>
+                                <option value="7">Entertainment</option>
+                                <option value="8">Miscellaneous</option>
+                            </select>
+                            <label for="amount" class="amt">Amount</label>
+                            <input type="number" class="uamount utext" name="amount" required>
+                            <input type="submit" class="update utext" tabindex="-1">
 
-                </form>
-            </div>
-        </div>
+                        </form>
+                    </div>
+                </div>
         </div>
         <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js"></script>
         <script src="index.js"></script>
-    </main>
+        </main>
+    </div>
+    </div>
 </body>
 
 </html>

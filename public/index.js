@@ -1,20 +1,19 @@
 'use strict';
-let token;
 
 $('.signin').show();
 $(toggleClasses);
 
 $('.js-signin').on('click', signIn());
 $('#main').on('click', '#new-account', signup());
-$('.js-create-account').on('click', createAccount());
+$('.signup').on('submit', createAccount(event));
 
 function signIn() {
-	return function() {
+	return function () {
+		$('.error').hide();
 		const user = {
 			username: $('.uname').val(),
 			password: $('.pwd').val()
 		};
-		console.log(user);
 		sendUserLoginDetails(user, openHomePage);
 	};
 }
@@ -35,11 +34,7 @@ function sendUserLoginDetails(user, callback) {
 }
 
 function openHomePage(data) {
-	token = data.jwtToken;
-	console.log(token);
-	localStorage.setItem('jwtToken', token);
-	token = '';
-	localStorage.setItem('username', data.user.username);
+	localStorage.setItem('jwtToken', data.jwtToken);
 	$('.signin').hide();
 	hideEntryPage();
 	fetchExpenseData(loadExpenseData);
@@ -51,18 +46,26 @@ function hideEntryPage() {
 	$('.nav').show();
 	$('.home').show();
 	$('.expenses').show();
+	$('body').css('background-image', 'none');
 }
 
-function loginFailure() {
-	return function(err) {
-		if (err.status === 401) {
-			$('.error').html('Username and/or password incorrect');
-		}
-	};
-}
+function loginFailure(err) {
+	if (err.responseText === "Unauthorized") {
+		$('.error').show();
+		$('.error').html("Incorrect username or password");
+	}
+};
+
+function accountCreationFailure(err) {
+	if (JSON.parse(err.responseText).error.includes("Database Error: A user with that username and/or email already exists.")) {
+		$('.error1').show();
+		$('.error1').html("Username already exists.Please try different username");
+	}
+};
 
 function fetchExpenseData(callback) {
-	token = localStorage.getItem('jwtToken');
+	let token = localStorage.getItem('jwtToken');
+
 	const userDetails = {
 		url: '/api/expenses',
 		type: 'GET',
@@ -77,40 +80,43 @@ function fetchExpenseData(callback) {
 }
 
 function loadExpenseData(data) {
-	$('.home').show();
-	let expenses = createExpenseTable(data);
-	$('.expenseDetails').html(expenses);
+	if (data.length > 0) {
+		$('.home').show();
+		$('.graph').show();
+		let expenses = createExpenseTable(data);
+		$('.expenseDetails').html(expenses);
+	} else {
+		$('.graph').hide();
+		$('.expenseDetails').html(`<span class="empty">You haven't added any expenses.Please go ahead and add some</span>`);
+	}
 }
 
 function createExpenseTable(expenseData) {
-	console.log(expenseData);
 	const expenses = expenseData.map(expense => {
 		return `<tr data=${expense.id}>
               <td>${expense.date}</td>
               <td>${expense.expenseInfo}</td>
               <td>${expense.category}</td>
               <td>${expense.amount}</td>
-			  <td><button class="edit-btn js-edit"><i class="fa fa-edit" aria-hidden="true"></i>Edit</button></td> 
-              <td><button class ="delete-btn js-delete"><i class ="fa fa-trash-o" aria-hidden ="true"></i>Delete</button></td>
+			  <td><button class="edit-btn js-edit"><i class="fa fa-edit" aria-hidden="true"></i></button></td> 
+              <td><button class ="delete-btn js-delete"><i class ="fa fa-trash-o" aria-hidden ="true"></i></button></td>
       </tr>`;
 	});
-	let expenseHeader = `<tr>
+	let expenseHeader = `<thead><tr>
            <th>Date</th> 
            <th>Expense Info</th> 
            <th>Category</th> 
 		   <th>Amount</th> 
 		   <th>Edit</th>
 		   <th>Delete</th>
-         </tr>`;
-	let expenseTable = `<table class="expenseTable">${expenseHeader}${expenses.join(
-		''
-	)}</table>`;
+         </tr></thead>`;
+	let expenseTable = `<table class="expenseTable">${expenseHeader}<tbody>${expenses.join('')}</tbody></table>`;
 	return expenseTable;
 }
 
-function addExpenseData() {
-	return function() {
-		console.log('Add expense data');
+function addExpenseData(event) {
+	return function (event) {
+		event.preventDefault();
 		const expenseInfo = {
 			date: $('.date').val(),
 			expenseInfo: $('.info').val(),
@@ -122,6 +128,8 @@ function addExpenseData() {
 }
 
 function saveExpenseData(expenseInfo, callback) {
+	let token = localStorage.getItem('jwtToken');
+
 	const expenseDetails = {
 		url: '/api/expenses',
 		type: 'POST',
@@ -137,33 +145,27 @@ function saveExpenseData(expenseInfo, callback) {
 }
 
 function refreshExpenseGrid(data) {
-	console.log('load expense data');
-	const latestExpense = `<tr data=${data.id}>
-              <td>${data.date}</td>
-              <td>${data.expenseInfo}</td>
-              <td>${data.category}</td>
-              <td>${data.amount}</td>
-			  <td><button class="edit-btn js-edit"><i class="fa fa-edit" aria-hidden="true"></i>Edit</button></td> 
-              <td><button class ="delete-btn js-delete"><i class ="fa fa-trash-o" aria-hidden ="true"></i>Delete</button></td>
-      </tr>`;
-	$('.expenseTable').append(latestExpense);
+	$('.empty').hide();
+	$('.graph').show();
+	let expenseTable = createExpenseTable(data);
+	$('.expenseDetails').html(expenseTable);
+
+
 }
 
 function signup() {
-	return function(event) {
+	return function (event) {
 		$('.signup').show();
-		console.log('Clicked signup link');
+		$('.error1').hide();
 		localStorage.removeItem('jwtToken');
-		token = '';
-		console.log(localStorage.getItem('jwtToken'), token);
 		$('.signin').hide();
 		$('.home').hide();
 	};
 }
 
-function createAccount() {
-	return function(event) {
-		console.log('clicked signup button');
+function createAccount(event) {
+	return function (event) {
+		event.preventDefault();
 		let user = {
 			name: $('.name').val(),
 			email: $('.email').val(),
@@ -176,7 +178,6 @@ function createAccount() {
 }
 
 function sendAccountCreationDetails(user) {
-	console.log(user);
 	let accountCreationInfo = {
 		url: '/api/users',
 		type: 'POST',
@@ -189,82 +190,48 @@ function sendAccountCreationDetails(user) {
 		headers: {
 			'Content-Type': 'application/json'
 		},
-		success: function() {
+		success: function () {
 			alert('User created successfully');
-			console.log('User created successfully');
 			$('.signin').show();
-			$('.signup').hide();
-			$('.home').hide();
-			$('.expenses').hide();
+			// $('.signup').hide();
+			// $('.home').hide();
+			// $('.expenses').hide();
+			toggleClasses();
 		},
-		error: loginFailure
+		error: accountCreationFailure
 	};
 	$.ajax(accountCreationInfo);
 }
 
-$('.homeTab').click(function() {
-	console.log('hime tab clicked');
+$('.homeTab').click(function () {
 	$('.home').show();
 	$('#tabs').hide();
 });
 
-$('.signout').click(function() {
+$('.signout').click(function () {
 	localStorage.removeItem('jwtToken');
+	$('body').css('background-image', `url('images/money.jpg')`);
 	$('.signin').show();
-	$('.home').hide();
-	$('.expenses').hide();
-	$('.nav').hide();
-	$('#tabs').hide();
+	toggleClasses();
 });
 
-function isAuthenticated(cb) {
-	$.ajax({
-		url: '/isAuthenticated',
-		method: 'GET',
-		headers: {
-			Authorization: 'Bearer ' + localStorage.getItem('jwt_token')
-		},
-		success: cb,
-		error: cb
-	});
-}
-
-function handleView() {
-	$('.expenses').show();
-	fetchExpenseData(loadExpenseData);
-}
-
-/*isAuthenticated(response => {
-	if (response === 'OK') {
-		$('.signin').toggle();
-		console.log(`You are authenticated!`);
-		handleView();
-		$('.nav').show();
-	} else {
-		console.log(`You are not authenticated!`);
-		$('.signin').show();
-	}
-});  */
-
-$(function() {
-	$('#datepicker').datepicker({
+function date() {
+	return {
 		dateFormat: 'dd-M-yy',
-		changeYear: true,
+		maxDate: "0d",
 		changeMonth: true
-	});
+	};
+}
+
+$(function () {
+	$('#datepicker').datepicker(date());
 	$('#datepicker').datepicker('setDate', new Date());
 });
 
-$(function() {
-	$('#datepicker1').datepicker({
-		dateFormat: 'dd-M-yy',
-		changeYear: true,
-		changeMonth: true
-	});
-});
-
 function updateExpense() {
-	var updatedExpense = {
+	let token = localStorage.getItem('jwtToken');
+
+	let updatedExpense = {
 		date: $('.udate').val(),
 		expenseInfo: $('.uinfo').val(),
 		category: $('#ucategory option:selected').text(),
@@ -281,7 +248,7 @@ function updateExpense() {
 			Authorization: `Bearer ${token}`
 		},
 		success: saveUpdatedExpense,
-		error: function(err) {
+		error: function (err) {
 			console.log(err);
 		}
 	};
@@ -289,11 +256,11 @@ function updateExpense() {
 }
 
 function saveUpdatedExpense(data) {
-	window.alert('Saved successfully');
+	alert('Saved successfully');
 }
 
 function onFormSubmit(formContext, date, expenseInfo, category, amount, id) {
-	formContext.find('form').on('submit', function(event) {
+	formContext.find('form').on('submit', function (event) {
 		event.preventDefault();
 
 		const expenseInfoValue = formContext.find('form input[name=info]').val();
@@ -305,7 +272,6 @@ function onFormSubmit(formContext, date, expenseInfo, category, amount, id) {
 		expenseInfo.text(expenseInfoValue);
 		category.text(categoryValue);
 		amount.text(amountValue);
-
 		formContext.dialog('close');
 	});
 }
@@ -315,16 +281,12 @@ function edit() {
 	$('#dialog-form').dialog({
 		open: function dialogOpened() {
 			const formContext = $(this);
-
 			const tr = editButton.closest('tr');
-
 			const id = tr.attr('data');
-
 			const date = tr.find('td:nth-child(1)');
 			const expenseInfo = tr.find('td:nth-child(2)');
 			const category = tr.find('td:nth-child(3)');
 			const amount = tr.find('td:nth-child(4)');
-
 			const dateValue = date.text();
 			const expenseInfoValue = expenseInfo.text();
 			const categoryValue = category.text();
@@ -332,14 +294,11 @@ function edit() {
 			formContext.find('form input[name=info]').val(expenseInfoValue);
 			formContext.find('form input[name=date]').val(dateValue);
 			$('#ucategory option:contains(' + categoryValue + ')').attr(
-				'selected',
-				true
-			);
+				'selected', true);
 			formContext.find('form input[name=amount]').val(amountValue);
-
 			onFormSubmit(formContext, date, expenseInfo, category, amount, id);
 		},
-		close: function() {
+		close: function () {
 			$('#dialog-form form').off();
 		}
 	});
@@ -347,8 +306,9 @@ function edit() {
 
 $('#main').on('click', '.js-edit', edit);
 
-$('.js-expense').on('click', addExpenseData());
-$('.graph').on('click', function() {
+$('.expenseForm').on('submit', addExpenseData(event));
+
+$('.graph').on('click', function () {
 	toggleClasses();
 	$('#tabs').tabs();
 	$('#tabs').show();
@@ -360,10 +320,12 @@ function toggleClasses() {
 	$('.nav').hide();
 	$('.home').hide();
 	$('#tabs').hide();
+	$('.error').hide();
+	$('.error1').hide();
 }
 
-$('#month').change(function() {
-	$('.card').hide();
+$('#month').change(function () {
+	$('.card1').hide();
 	$('.graphData').empty();
 	let month = $('#month option:selected').text();
 	let year = new Date().getFullYear();
@@ -371,10 +333,13 @@ $('#month').change(function() {
 		month: month,
 		year: year
 	};
-	if (month !== 'Please select') getMonthlyExpenses(query, generateGraphReport);
+	if (month !== 'Please select') {
+		getMonthlyExpenses(query, generateGraphReport);
+	}
 });
 
 function getMonthlyExpenses(query, callback) {
+	let token = localStorage.getItem('jwtToken');
 	const request = {
 		url: '/api/expenses/monthly',
 		method: 'POST',
@@ -384,7 +349,7 @@ function getMonthlyExpenses(query, callback) {
 			Authorization: `Bearer ${token}`
 		},
 		success: callback,
-		error: function(err) {
+		error: function (err) {
 			console.error(err);
 		}
 	};
@@ -394,18 +359,43 @@ function getMonthlyExpenses(query, callback) {
 function generateGraphReport(data) {
 	let totalAmount = 0;
 	if (data.length > 0) {
-		if (data.length === 1) {
-			totalAmount = data[0].amount;
-			console.log('amount', totalAmount);
-		} else {
-			totalAmount = data.reduce((total, sum) => total.amount + sum.amount);
-			console.log('amount', totalAmount);
-		}
-		$('.card').show();
+		totalAmount = getTotalAmount(data, totalAmount);
+		$('.card1').show();
 		$('.monthlyTotal').html(`$${totalAmount}`);
 		let graphData = prepareCategoryExpensePair(data);
 		prepareGraph(graphData, '.graphData');
+	} else {
+		$('.monthlyInfo').html("No records found for the selected month");
 	}
+}
+
+$(function () {
+	$('#datepicker1').datepicker(date);
+});
+
+$(function () {
+	$('#datepicker2').datepicker({
+		dateFormat: 'dd-M-yy',
+		onSelect: function (day) {
+			$('.card2').hide();
+			getDailyExpense(day)
+		}
+	});
+});
+
+function getTotalAmount(data, totalAmount) {
+	if (data.length === 1) {
+		totalAmount = data[0].amount;
+	} else {
+		totalAmount = data.reduce((total, sum) => total.amount + sum.amount);
+		totalAmount = data.map(function (obj) {
+				return obj.amount;
+			})
+			.reduce(function (a, b) {
+				return a + b;
+			});
+	}
+	return totalAmount;
 }
 
 function prepareCategoryExpensePair(data) {
@@ -414,17 +404,15 @@ function prepareCategoryExpensePair(data) {
 			let category = item.category;
 			let amount = item.amount;
 			if (typeof obj[category] !== 'number') {
-				obj[category] = amount; // initialize value that wasn't found yet
+				obj[category] = amount;
 			} else {
-				obj[category] += amount; // update the value with the current increment
+				obj[category] += amount;
 			}
 			return obj;
 		}, {});
-		console.log(totalCategoryExpenses);
-		var graphData = [];
-		for (var key in totalCategoryExpenses) {
-			console.log(key);
-			var items = {
+		let graphData = [];
+		for (let key in totalCategoryExpenses) {
+			let items = {
 				Name: key,
 				Value: totalCategoryExpenses[key]
 			};
@@ -435,40 +423,40 @@ function prepareCategoryExpensePair(data) {
 }
 
 function prepareGraph(graphData, graphClass) {
-	var width = 460;
-	var height = 360;
-	var radius = Math.min(width, height) / 2;
-	var color = d3.scale.category10();
-	var svg = d3
+	let width = 460;
+	let height = 360;
+	let radius = Math.min(width, height) / 2;
+	let color = d3.scale.category20();
+	$(graphClass).empty();
+	let svg = d3
 		.select(graphClass)
 		.append('svg')
 		.attr('width', width)
 		.attr('height', height)
 		.append('g')
 		.attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')');
-	var arc = d3.svg
+	let arc = d3.svg
 		.arc()
 		.outerRadius(radius - 10)
 		.innerRadius(radius - 80);
-	var div = d3
+	let div = d3
 		.select('body')
 		.append('div')
 		.attr('class', 'tooltip')
 		.style('opacity', 0);
-	var pie = d3.layout
+	let pie = d3.layout
 		.pie()
-		.value(function(d, i) {
-			console.log(d);
+		.value(function (d, i) {
 			return d.Value;
 		})
 		.sort(null);
-	var path = svg
+	let path = svg
 		.selectAll('path')
 		.data(pie(graphData))
 		.enter()
 		.append('path')
 		.attr('d', arc)
-		.on('mouseover', function(d) {
+		.on('mouseover', function (d) {
 			div
 				.transition()
 				.duration(0)
@@ -478,28 +466,31 @@ function prepareGraph(graphData, graphClass) {
 				.style('left', d3.event.pageX + 'px')
 				.style('top', d3.event.pageY - 28 + 'px');
 		})
-		.on('mouseout', function(d) {
+		.on('mouseout', function (d) {
 			div
 				.transition()
 				.duration(0)
 				.style('opacity', 0);
 		})
-		.attr('fill', function(d, i) {
+		.attr('fill', function (d, i) {
 			return color(d.data.Name);
 		});
 }
 
-function getDailyExpense() {
-	console.log('daily');
+function getDailyExpense(day) {
+	let token = localStorage.getItem('jwtToken');
 	const request = {
 		url: '/api/expenses/daily',
-		method: 'GET',
+		method: 'POST',
+		data: JSON.stringify({
+			"date": day
+		}),
 		headers: {
 			'Content-Type': 'application/json',
 			Authorization: `Bearer ${token}`
 		},
 		success: generateDailyGraphReport,
-		error: function(err) {
+		error: function (err) {
 			console.error(err);
 		}
 	};
@@ -507,27 +498,28 @@ function getDailyExpense() {
 }
 
 function generateDailyGraphReport(data) {
-	let graphData = prepareCategoryExpensePair(data);
-	console.log(graphData);
-	prepareGraph(graphData, '.dailyGraphData');
+	let totalAmount = 0;
+	if (data.length > 0) {
+		totalAmount = getTotalAmount(data, totalAmount);
+		$('.card2').show();
+		$('.dailyTotal').html(`$${totalAmount}`);
+		let graphData = prepareCategoryExpensePair(data);
+		prepareGraph(graphData, '.dailyGraphData');
+	} else
+		$('.dailyInfo').html("No records found for selected date");
 }
 
 $('#tabs').tabs({
-	activate: function(event, ui) {
-		console.log('inside activate', ui.newTab.index());
-
+	activate: function (event, ui) {
 		if (ui.newTab.index() == 2) {
-			console.log('stats');
 			getTotalExpenses();
 			getBarGraph();
-		} else if (ui.newTab.index() == 1) {
-			console.log('daily');
-			getDailyExpense();
-		}
+		} 
 	}
 });
 
 function getTotalExpenses() {
+	let token = localStorage.getItem('jwtToken');
 	const request = {
 		url: '/api/expenses/totalExpenses',
 		method: 'GET',
@@ -536,7 +528,7 @@ function getTotalExpenses() {
 			Authorization: `Bearer ${token}`
 		},
 		success: generateTotalExpenseReport,
-		error: function(err) {
+		error: function (err) {
 			console.log(err);
 		}
 	};
@@ -544,12 +536,15 @@ function getTotalExpenses() {
 }
 
 function generateTotalExpenseReport(data) {
-	console.log(data);
-	let graphData = prepareCategoryExpensePair(data);
-	prepareGraph(graphData, '.totalExpenseGraph');
+	if (data.length > 0) {
+		let graphData = prepareCategoryExpensePair(data);
+		prepareGraph(graphData, '.totalExpenseGraph');
+	} else
+		$('.totalInfo').html("No records found");
 }
 
 function getBarGraph() {
+	let token = localStorage.getItem('jwtToken');
 	const request = {
 		url: '/api/expenses/groupExpense',
 		method: 'GET',
@@ -558,7 +553,7 @@ function getBarGraph() {
 			Authorization: `Bearer ${token}`
 		},
 		success: createBarGraph,
-		error: function(err) {
+		error: function (err) {
 			console.log(err);
 		}
 	};
@@ -566,36 +561,36 @@ function getBarGraph() {
 }
 
 function createBarGraph(data) {
-	console.log('bar', data);
-	var svgWidth = 600;
-	var svgHeight = 300;
+	let svgWidth = 600;
+	let svgHeight = 300;
 
-	var heightPad = 50;
-	var widthPad = 50;
+	let heightPad = 50;
+	let widthPad = 50;
+
 	$('.barGraph').empty();
-	var svg = d3
+	let svg = d3
 		.select('.barGraph')
 		.append('svg')
 		.attr('width', svgWidth + widthPad * 2)
 		.attr('height', svgHeight + heightPad * 2)
 		.append('g')
-		.attr('transform', 'translate(' + widthPad + ',' + heightPad + ')');
+		.attr('transform', 'translate(' + widthPad + ',' + 40 + ')');
 
 	//Set up scales
-	var xScale = d3.scale
+	let xScale = d3.scale
 		.ordinal()
 		.domain(
-			data.map(function(d) {
+			data.map(function (d) {
 				return d._id;
 			})
 		)
 		.rangeRoundBands([0, svgWidth], 0.1);
 
-	var yScale = d3.scale
+	let yScale = d3.scale
 		.linear()
 		.domain([
 			0,
-			d3.max(data, function(d) {
+			d3.max(data, function (d) {
 				return d.Total;
 			})
 		])
@@ -607,20 +602,20 @@ function createBarGraph(data) {
 		.data(data)
 		.enter()
 		.append('rect')
-		.attr('x', function(d) {
+		.attr('x', function (d) {
 			return xScale(d._id) + widthPad;
 		})
-		.attr('y', function(d) {
+		.attr('y', function (d) {
 			return yScale(d.Total);
 		})
-		.attr('height', function(d) {
+		.attr('height', function (d) {
 			return svgHeight - yScale(d.Total);
 		})
 		.attr('width', xScale.rangeBand())
 		.attr('fill', 'blue');
 
 	// Y axis
-	var yAxis = d3.svg
+	let yAxis = d3.svg
 		.axis()
 		.scale(yScale)
 		.orient('left');
@@ -637,7 +632,7 @@ function createBarGraph(data) {
 		.text('Total Expense');
 
 	// X axis
-	var xAxis = d3.svg
+	let xAxis = d3.svg
 		.axis()
 		.scale(xScale)
 		.orient('bottom');
@@ -653,21 +648,21 @@ function createBarGraph(data) {
 		.text('Monthly expenses for current year');
 }
 
-$('#main').on('click', '.js-delete', function() {
+$('#main').on('click', '.js-delete', function () {
 	let confirm = window.confirm('Are you sure you want to delete?');
 	if (confirm == true) {
 		let expenseId = $(this)
 			.closest('tr')
 			.attr('data');
-		console.log(expenseId);
 		$(this)
 			.closest('tr')
 			.remove();
 		deleteExpense(expenseId);
-	} else console.log('Cancel');
+	} 
 });
 
 function deleteExpense(expenseId) {
+	let token = localStorage.getItem('jwtToken');
 	let request = {
 		url: `/api/expenses/${expenseId}`,
 		type: 'DELETE',
@@ -675,7 +670,7 @@ function deleteExpense(expenseId) {
 			'Content-Type': 'application/json',
 			Authorization: `Bearer ${token}`
 		},
-		error: function(err) {
+		error: function (err) {
 			console.log(JSON.stringify(err));
 		}
 	};
@@ -683,5 +678,5 @@ function deleteExpense(expenseId) {
 }
 
 function onSuccessFullDeletion() {
-	console.log('deleted successfully');
+	alert('Record deleted successfully');
 }

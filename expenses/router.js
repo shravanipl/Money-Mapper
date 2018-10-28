@@ -42,10 +42,10 @@ expenseRouter.post('/monthly', jwtPassportMiddleware, (request, response) => {
         });
 });
 
-expenseRouter.get('/daily', jwtPassportMiddleware, (request, response) => {
+expenseRouter.post('/daily', jwtPassportMiddleware, (request, response) => {
     Expense.find({
             user: request.user.id,
-            date: date(new Date(), "dd-mmm-yyyy")
+            date: request.body.date
         })
         .populate('user')
         .then(expenses => {
@@ -65,24 +65,24 @@ expenseRouter.get('/totalExpenses', jwtPassportMiddleware, (request, response) =
 
 expenseRouter.get('/groupExpense', jwtPassportMiddleware, (request, response) => {
     console.log(request.user.id);
-    Expense.aggregate([
-          {
-                 "$match": {
-                     "user": mongoose.Types.ObjectId(request.user.id)
-                 }
-                 },
+    Expense.aggregate([{
+                "$match": {
+                    "user": mongoose.Types.ObjectId(request.user.id)
+                }
+            },
             {
                 "$group": {
                     "_id": {
                         "$arrayElemAt": [{
-                            "$split": ["$date", "-"]}, 1]
+                            "$split": ["$date", "-"]
+                        }, 1]
                     },
                     "Total": {
                         "$sum": "$amount"
                     }
                 }
             }
-    ])
+        ])
         .then(expenses => {
             console.log("expenses", expenses);
             return response.status(HTTP_STATUS_CODES.OK).json(expenses);
@@ -110,24 +110,23 @@ expenseRouter.post('/', jwtPassportMiddleware, (request, response) => {
         });
     }
 
-    Expense.create(expense)
-        .then(expense => {
-            console.log("get latest expense records");
-            return response.status(HTTP_STATUS_CODES.CREATED).json(expense.serialize());
+     Expense.create(expense)
+         .then(expense => {
+             console.log("get latest expense records");
 
-            // Expense.find({
-            //         user: request.user.id
-            //     })
-            //     .populate('user')
-            //     .then(expenses => {
-            //         const latestExpenses = expenses.map(expense => expense.serialize());
-            //         console.log(latestExpenses);
-            //         return response.status(HTTP_STATUS_CODES.CREATED).json(latestExpenses);
-            //     })
-            //     .catch(error => {
-            //         return response.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json(error);
-            //     });
-        });
+              Expense.find({
+                      user: request.user.id
+                  })
+                  .populate('user')
+                  .then(expenses => {
+                      const latestExpenses = expenses.map(expense => expense.serialize());
+                      console.log(latestExpenses);
+                      return response.status(HTTP_STATUS_CODES.CREATED).json(latestExpenses);
+                  })
+                  .catch(error => {
+                      return response.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json(error);
+                  });
+         });
 });
 
 

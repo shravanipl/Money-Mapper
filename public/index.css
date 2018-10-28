@@ -2,7 +2,7 @@
 	box-sizing: border-box;
 	margin: 0 auto;
 	padding: 0;
-	font-family: 'Playfair Display',serif;
+	font-family: 'Source Sans Pro', sans-serif;
 }
 
 body {
@@ -10,6 +10,62 @@ body {
 	padding: 0px;
 	background-image: url('images/money.jpg');
 	background-repeat: no-repeat;
+	opacity: 2;
+}
+
+.formTitle {
+	color: black;
+	font-size: 20px;
+	text-align: center;
+	margin-top: 20px;
+}
+
+.snip1582 {
+	color: black;
+	line-height: 1em;
+	position: relative;
+	background-color: white;
+}
+
+.snip1582:before,
+.snip1582:after {
+	border-color: transparent;
+	-webkit-transition: all 0.25s;
+	transition: all 0.25s;
+	border-style: solid;
+	border-width: 0;
+	content: "";
+	height: 24px;
+	position: absolute;
+	width: 24px;
+}
+
+.snip1582:before {
+	border-color: #6cc091;
+	border-top-width: 2px;
+	left: 0px;
+	top: -5px;
+}
+
+.snip1582:after {
+	border-bottom-width: 2px;
+	border-color: #6cc091;
+	bottom: -5px;
+	right: 0px;
+}
+
+.snip1582:hover,
+.snip1582.hover {
+	background-color: #6cc091;
+	color: white;
+}
+
+.snip1582:hover:before,
+.snip1582.hover:before,
+.snip1582:hover:after,
+.snip1582.hover:after {
+	height: 100%;
+	width: 100%;
 }
 
 header {
@@ -19,6 +75,7 @@ header {
 h1 {
 	margin: 0;
 	padding: 20px;
+	color: black;
 }
 
 .heading {
@@ -26,49 +83,141 @@ h1 {
 	color: red;
 }
 
+.expenses {
+	display: inline-flex;
+	border: 20px;
+	margin: 25px;
+}
+
 table {
-	color: #333;
-	width: 640px;
+	border-spacing: 1;
 	border-collapse: collapse;
-	border-spacing: 0;
-	font-family: 'Fjalla One',	sans-serif;
-
+	border-radius: 6px;
+	overflow: hidden;
+	max-width: 800px;
+	width: 100%;
+	margin: 0 auto;
+	position: relative;
+	font: 400 14px;
+	background: #595959;
+	color: white;
 }
 
-td,
-th {
-	border: 1px solid transparent;
-	height: 30px;
-	transition: all 0.3s;
+table * {
+	position: relative;
+	font-size: 18px;
 }
 
-th {
-	background: #dfdfdf;
-	font-weight: bold;
+i.fa.fa-edit,
+i.fa.fa-trash-o {
+	font-size: 18px;
+	color: white;
 }
 
-td {
-	background: #fafafa;
+table td,
+table th {
+	padding-left: 8px;
 	text-align: center;
 }
 
-/* Cells in even rows (2,4,6...) are one color */
-tr:nth-child(even) td {
-	background: rgb(209, 198, 188);
-}
-
-/* Cells in odd rows (1,3,5...) are another (excludes header cells)  */
-tr:nth-child(odd) td {
-	background: rgb(218, 185, 155);
-}
-
-tr td:hover {
-	background: white;
+table thead tr {
+	height: 60px;
+	background: #6cc091;
+	font-size: 16px;
 	color: black;
 }
 
-.edit-btn {
-	color: yellow;
+table tbody tr {
+	height: 48px;
+	border-bottom: 1px solid #e3f1d5;
+}
+
+table tbody tr:last-child {
+	border: 0;
+}
+
+table td.l,
+table th.l {
+	text-align: right;
+}
+
+table td.c,
+table th.c {
+	text-align: center;
+}
+
+table td.r,
+table th.r {
+	text-align: center;
+}
+
+@media screen and (max-width: 320px) {
+
+	.expenses {
+		margin: 35px;
+		padding: 20px;
+	}
+
+	table {
+		display: block;
+	}
+
+	table>*,
+	table tr,
+	table td,
+	table th {
+		display: block;
+	}
+
+	table thead {
+		display: none;
+	}
+
+	table tbody tr {
+		height: auto;
+		padding: 8px 0;
+	}
+
+	table tbody tr td {
+		padding-left: 45%;
+		margin-bottom: 12px;
+	}
+
+	table tbody tr td:last-child {
+		margin-bottom: 0;
+	}
+
+	table tbody tr td:before {
+		position: absolute;
+		font-weight: 700;
+		width: 40%;
+		left: 10px;
+		top: 0;
+	}
+
+	table tbody tr td:nth-child(1):before {
+		content: "Date";
+	}
+
+	table tbody tr td:nth-child(2):before {
+		content: "Expense Info";
+	}
+
+	table tbody tr td:nth-child(3):before {
+		content: "Category";
+	}
+
+	table tbody tr td:nth-child(4):before {
+		content: "Amount";
+	}
+
+	table tbody tr td:nth-child(5):before {
+		content: "Edit";
+	}
+
+	table tbody tr td:nth-child(6):before {
+		content: "Delete";
+	}
 }
 
 .delete-btn,
@@ -82,10 +231,6 @@ button {
 	font-weight: bold;
 }
 
-.delete-btn {
-	color: crimson;
-}
-
 #dialog-form {
 	display: none;
 }
@@ -97,13 +242,18 @@ button {
 .signup {
 	display: none;
 }
-/*a {
-	background-color: transparent;
+
+a#new-account {
+	font-size: 19px;
 	color: white;
-	 font-weight: bold;
-	font-size: 20px;
-	-webkit-text-decoration-skip: objects;
-} */
+}
+
+a#new-account:hover {
+	color: rgb(32, 80, 226);
+	font-weight: bold;
+	font-size: 22px;
+}
+
 a:visited {
 	color: floralwhite;
 	font-weight: bolder;
@@ -143,7 +293,7 @@ ul li ul {
 	display: none;
 }
 
-ul li:hover > ul,
+ul li:hover>ul,
 ul li ul:hover {
 	visibility: visible;
 	opacity: 1;
@@ -155,9 +305,38 @@ ul li ul li {
 	width: 100%;
 }
 
+.input,
+.text {
+	border-radius: 10px;
+	border: 2px solid #6cc091;
+	text-align: center;
+}
+
 input.update {
 	display: block;
 	margin: 5px;
+	transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+	background-color: transparent;
+	color: black;
+	border-radius: 30px;
+	cursor: pointer;
+	font-size: .75em;
+	font-weight: 400;
+	height: 3.75em;
+	line-height: 3.85em;
+	letter-spacing: 2px;
+	padding: 0 4em;
+	text-align: center;
+	text-decoration: none;
+	text-transform: uppercase;
+	white-space: nowrap;
+}
+
+.ui-dialog .ui-dialog-titlebar {
+	padding: .4em 1em;
+	position: relative;
+	background-color: #25b7c4;
+	font-size: 18px;
 }
 
 .uname,
@@ -187,6 +366,15 @@ input.update {
 text {
 	display: inline-block;
 	height: 20px;
+	font-size: 20px;
+}
+
+h2 {
+	margin-bottom: 10px;
+}
+
+.barGraph {
+	display: block;
 }
 
 a {
@@ -202,28 +390,62 @@ a {
 	margin-right: auto;
 	padding: 15px;
 	border-radius: 30px;
-	color: white;
-	background-color: #2577e9;
 	text-transform: uppercase;
-	transition: opacity 0.25s ease-in-out;
-	letter-spacing: 0.2em;
+	font-weight: bold;
 }
 
 .js-create-account {
-	padding: 20px;
-	margin-left: auto;
-	margin-right: auto;
+	margin: 0 auto;
 	background-color: transparent;
-	border: 2px solid white;
-	border-radius: 20px;
+	margin-left: 20px;
+	padding: 5px;
+	display: inline-block;
+	height: 50px;
+	border-radius: 30px;
+	color: black;
+	border: 2px solid #6cc091;
 }
 
-input.utext {
+
+input.utext,
+select#ucategory,
+#month,
+.day {
 	margin: 12px;
+	-ms-appearance: none;
+	appearance: none;
+	border-radius: 10px;
+	border: none;
+	border: solid 2px #8dcca9;
+	display: block;
+	height: 45px;
+}
+
+input.utext,
+select#ucategory,
+#month,
+.day {
+	outline: none;
+	text-align: center;
 }
 
 .amt {
 	display: block;
+}
+
+.monthlyInfo,
+.dailyInfo,
+.totalInfo {
+	padding: 25px;
+	text-align: center;
+	font-weight: bold;
+	color: #007fff;
+	font-size: 20px;
+}
+
+i.fa.fa-money.float-right {
+	padding: 5px;
+	font-size: 22px;
 }
 
 graph .ui-tabs .ui-tabs-panel {
@@ -231,7 +453,6 @@ graph .ui-tabs .ui-tabs-panel {
 }
 
 .arc text {
-	font: 10px sans-serif;
 	text-anchor: middle;
 }
 
@@ -252,6 +473,18 @@ div.tooltip {
 	border-radius: 8px;
 	box-shadow: 5px 5px 5px #888888;
 	pointer-events: none;
+}
+
+.ui-dialog.ui-corner-all.ui-widget.ui-widget-content.ui-front.ui-draggable.ui-resizable {
+	background-color: white;
+}
+
+.ui-dialog-titlebar.ui-corner-all.ui-widget-header.ui-helper-clearfix.ui-draggable-handle {
+	background-color: #6cc091;
+}
+
+span#ui-id-4 {
+	font-size: 20px;
 }
 
 .col-sm-12 {
@@ -283,24 +516,19 @@ div.tooltip {
 	color: #ddd !important;
 }
 
-.card1 {
+.card1,
+.card2 {
 	background: #9a4c48 !important;
 }
 
-.card {
-	margin-top: 15px;
-	border-left: 10px solid rgba(0, 0, 0, 0.1) !important;
+.expenseTable {
+	margin-top: 30px;
 }
 
-td {
-	border: solid 2px black;
-}
-
-.expenses {
-	height: 35px;
-	display: inline-flex;
-	border: 20px;
-	margin: 25px;
+.expenseFields {
+	box-shadow: 0 0 0.5rem 0 rgba(102, 142, 209, 0.325);
+	margin-top: 10px;
+	text-align: center;
 }
 
 label {
@@ -309,19 +537,35 @@ label {
 }
 
 .expense {
-	border: 2px solid white;
-	height: 30px;
-	width: 120px;
-	border-radius: 15px;
+	margin-left: 20px;
+	padding: 5px;
+	display: inline-block;
+	height: 50px;
+	border-radius: 30px;
+	color: black;
+	border: 2px solid #6cc091;
+}
+
+.input:hover {
+	border: 4px solid #6cc091;
+	outline: none;
+}
+
+.expense:hover {
+	color: #6cc091;
+	border: 2px solid #6cc091;
+	background: rgba(62, 219, 130, 0.15);
+}
+
+.error1 {
+	color: red;
+	font-size: 15px;
+	font-weight: bold;
+	display: none;
 }
 
 #stats {
 	display: inline;
-}
-
-.newExpense {
-	top: 20px;
-	left: 30px;
 }
 
 .signin,
@@ -330,7 +574,6 @@ label {
 	border-radius: 8px;
 	padding: 15px 30px;
 	border: 2px solid white;
-	color: #fff;
 	font-size: 14px;
 	position: relative;
 	margin-top: 100px;
@@ -338,12 +581,19 @@ label {
 	cursor: pointer;
 	width: 300px;
 	text-align: center;
+	background: rgba(163, 153, 153, 0.3);
+	color: white;
 }
 
 input.update.utext {
-	background: rgba(255, 64, 88, 0.74);
 	border-radius: 30px;
-	border: 2px solid;
+	margin: auto;
+	background-color: rgba(108, 192, 145, 0.15);
+}
+
+input.update.utext:hover {
+	background-color: rgba(62, 219, 130, 0.15);
+	color: #6cc091;
 }
 
 .signup {
@@ -352,6 +602,10 @@ input.update.utext {
 
 select#ucategory {
 	margin: 12px;
+}
+
+select#ucategory:hover {
+	outline: none;
 }
 
 label.amt {
@@ -369,8 +623,32 @@ svg {
 	float: left;
 }
 
-.monthlyTotal {
+.monthlyTotal,
+.dailyTotal {
 	text-align: center;
 	padding: 40px;
+	font-weight: bold;
+}
+
+.nav,
+.home,
+#tab,
+.signup {
+	display: none;
+}
+
+.error {
+	color: yellow;
+	font-size: 18px;
+	font-weight: bold;
+	display: none;
+}
+
+.empty {
+	color: #6cc091;
+	text-align: center;
+	font-size: 19px;
+	display: block;
+	padding: 20px;
 	font-weight: bold;
 }

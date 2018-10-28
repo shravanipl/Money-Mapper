@@ -45,7 +45,7 @@ const UserJoiSchema = Joi.object().keys({
     // To learn more about Joi string validations, see:
     name: Joi.string().min(1).trim().required(),
     username: Joi.string().alphanum().min(4).max(30).trim().required(),
-    password: Joi.string().min(8).max(30).trim().required(),
+    password: Joi.string().min(5).max(30).trim().required(),
     email: Joi.string().email().trim().required()
 });
 

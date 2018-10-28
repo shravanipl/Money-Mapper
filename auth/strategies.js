@@ -16,7 +16,7 @@ const {
 
 
 // The LocalStrategy gets used while trying to access an Endpoint using a User + Password combination
-const localStrategy = new LocalStrategy((username, password, passportVerify) => {
+const localStrategy = new LocalStrategy((username, password, callback) => {
     let user;
     // Step 1: Verify the username exists
     User.findOne({
@@ -41,17 +41,18 @@ const localStrategy = new LocalStrategy((username, password, passportVerify) => 
                 reason: 'LoginError',
                 message: 'Incorrect username or password'
             });
+
         }
-        // Step 3B: If authentication is succesfull, execute the passportVerify callback correctly.
+        // Step 3B: If authentication is succesfull, execute the callback callback correctly.
         console.log("user valid");
-        return passportVerify(null, user);
+        return callback(null, user);
     }).catch(err => {
-        // Step 4: If an error ocurred at any stage during the process, execute the passportVerify callback correctly.
+        // Step 4: If an error ocurred at any stage during the process, execute the callback callback correctly.
 
         if (err.reason === 'LoginError') {
-            return passportVerify(null, false, err.message);
+            return callback(null, false, err.message);
         }
-        return passportVerify(err, false);
+        return callback(err, false);
     });
 });
 
