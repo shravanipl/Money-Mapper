@@ -5,7 +5,7 @@ $(toggleClasses);
 
 $('.js-signin').on('click', signIn());
 $('#main').on('click', '#new-account', signup());
-$('.signup').on('submit', createAccount(event));
+$('.signup').on('submit', createAccount());
 
 function signIn() {
 	return function () {
@@ -62,6 +62,9 @@ function accountCreationFailure(err) {
 		$('.error1').html("Username already exists.Please try different username");
 	}
 };
+function expenseCreationFailure(err) {
+	alert(JSON.parse(err.responseText).error.details[0].message); 
+};
 
 function fetchExpenseData(callback) {
 	let token = localStorage.getItem('jwtToken');
@@ -114,7 +117,7 @@ function createExpenseTable(expenseData) {
 	return expenseTable;
 }
 
-function addExpenseData(event) {
+function addExpenseData() {
 	return function (event) {
 		event.preventDefault();
 		const expenseInfo = {
@@ -123,6 +126,8 @@ function addExpenseData(event) {
 			category: $('#category option:selected').text(),
 			amount: $('.amount').val()
 		};
+		console.log(expenseInfo);
+
 		saveExpenseData(expenseInfo, refreshExpenseGrid);
 	};
 }
@@ -139,7 +144,7 @@ function saveExpenseData(expenseInfo, callback) {
 			Authorization: `Bearer ${token}`
 		},
 		success: callback,
-		error: loginFailure
+		error: expenseCreationFailure
 	};
 	$.ajax(expenseDetails);
 }
@@ -154,7 +159,7 @@ function refreshExpenseGrid(data) {
 }
 
 function signup() {
-	return function (event) {
+	return function () {
 		$('.signup').show();
 		$('.error1').hide();
 		localStorage.removeItem('jwtToken');
@@ -163,7 +168,7 @@ function signup() {
 	};
 }
 
-function createAccount(event) {
+function createAccount() {
 	return function (event) {
 		event.preventDefault();
 		let user = {
@@ -306,7 +311,7 @@ function edit() {
 
 $('#main').on('click', '.js-edit', edit);
 
-$('.expenseForm').on('submit', addExpenseData(event));
+$('.expenseForm').on('submit', addExpenseData());
 
 $('.graph').on('click', function () {
 	toggleClasses();
@@ -350,7 +355,7 @@ function getMonthlyExpenses(query, callback) {
 		},
 		success: callback,
 		error: function (err) {
-			console.error(err);
+			console.log(err);
 		}
 	};
 	$.ajax(request);
@@ -475,7 +480,7 @@ function prepareGraph(graphData, graphClass) {
 		.attr('fill', function (d, i) {
 			return color(d.data.Name);
 		});
-	
+
 	svg.append("text")
 		.attr("dy", "-0.5em")
 		.style("text-anchor", "middle")
@@ -531,7 +536,7 @@ $('#tabs').tabs({
 		if (ui.newTab.index() == 2) {
 			getTotalExpenses();
 			getBarGraph();
-		} 
+		}
 	}
 });
 
@@ -675,7 +680,7 @@ $('#main').on('click', '.js-delete', function () {
 			.closest('tr')
 			.remove();
 		deleteExpense(expenseId);
-	} 
+	}
 });
 
 function deleteExpense(expenseId) {
