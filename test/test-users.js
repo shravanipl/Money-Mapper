@@ -1,253 +1,112 @@
-'use strict';
-
+const mongoose = require('mongoose');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const expect = chai.expect;
-const {
-    app,
-    startServer,
-    stopServer
-} = require('../server');
 
+const faker = require('faker');
+
+const {
+    HTTP_STATUS_CODES
+} = require('../config');
+const {
+    startServer,
+    stopServer,
+    app
+} = require('../server.js');
 const {
     User
 } = require('../users/models');
-const {
-    TEST_DATABASE_URL
-} = require('../config');
 
-
-// This let's us make HTTP requests
-// in our tests.
-// see: https://github.com/chaijs/chai-http
+const expect = chai.expect;
 chai.use(chaiHttp);
 
-describe('/api/users', function () {
-    const username = 'exampleUser';
-    const password = 'examplePass';
-    const name = 'example';
-    const email = 'example@gmail.com';
-    const usernameB = 'exampleUserB';
-    const passwordB = 'examplePassB';
-    const nameB = 'exampleB';
-    const emailB = 'exampleB@gmail.com';
+describe('Integration tests for: /api/users', function () {
+    let testUser;
 
     before(function () {
-        return startServer(TEST_DATABASE_URL);
+
+        return startServer(true);
+    });
+
+    beforeEach(function () {
+        testUser = createFakerUser();
+        return User.create(testUser)
+            .then(() => {})
+            .catch(err => {
+                console.error(err);
+            });
+    });
+
+    afterEach(function () {
+
+        return new Promise((resolve, reject) => {
+            mongoose.connection.dropDatabase()
+                .then(result => {
+                    resolve(result);
+                })
+                .catch(err => {
+                    console.error(err);
+                    reject(err);
+                });
+        });
     });
 
     after(function () {
         return stopServer();
     });
 
-    beforeEach(function () {});
-
-    afterEach(function () {
-        return User.remove({});
+    it('Should return all users', function () {
+        return chai.request(app)
+            .get('/api/users')
+            .then(res => {
+                expect(res).to.have.status(HTTP_STATUS_CODES.OK);
+                expect(res).to.be.json;
+                expect(res.body).to.be.a('array');
+                expect(res.body).to.have.lengthOf.at.least(1);
+                expect(res.body[0]).to.include.keys('id', 'name', 'username', 'email');
+                expect(res.body[0]).to.not.include.keys('password');
+            });
     });
 
-    describe('/api/users', function () {
-        describe('POST', function () {
-            it('Should reject users with missing username', function () {
-                return chai
-                    .request(app)
-                    .post('/api/users')
-                    .send({
-                        password,
-                        name,
-                        email,
-
-                    })
-                    .then(() =>
-                        expect.fail(null, null, 'Request should not succeed')
-                    )
-                    .catch(err => {
-                        if (err instanceof chai.AssertionError) {
-                            throw err;
-                        }
-
-                        const res = err.response;
-                        expect(res).to.have.status(400);
-                        expect(res.body.error.details[0].message).to.equal(
-                            '"username" is required');
-                    });
+    it('Should return a specific user', function () {
+        let foundUser;
+        return chai.request(app)
+            .get('/api/users')
+            .then(res => {
+                expect(res).to.have.status(HTTP_STATUS_CODES.OK);
+                expect(res).to.be.json;
+                expect(res.body).to.be.a('array');
+                foundUser = res.body[0].id;
+                return chai.request(app).get(`/api/users/${foundUser}`);
+            })
+            .then(res => {
+                expect(res).to.have.status(HTTP_STATUS_CODES.OK);
+                expect(res).to.be.json;
+                expect(res.body).to.be.a('object');
+                expect(res.body.id).to.equals(foundUser);
             });
-            it('Should reject users with missing password', function () {
-                return chai
-                    .request(app)
-                    .post('/api/users')
-                    .send({
-                        username,
-                        name,
-                        email
-                    })
-                    .then(() =>
-                        expect.fail(null, null, 'Request should not succeed')
-                    )
-                    .catch(err => {
-                        if (err instanceof chai.AssertionError) {
-                            throw err;
-                        }
-
-                        const res = err.response;
-                        expect(res).to.have.status(400);
-                        expect(res.body.error.details[0].message).to.equal(
-                            '"password" is required');
-                    });
-            });
-            it('Should reject users with empty username', function () {
-                return chai
-                    .request(app)
-                    .post('/api/users')
-                    .send({
-                        username: '',
-                        password,
-                        name,
-                        email
-                    })
-                    .then(() =>
-                        expect.fail(null, null, 'Request should not succeed')
-                    )
-                    .catch(err => {
-                        if (err instanceof chai.AssertionError) {
-                            throw err;
-                        }
-
-                        const res = err.response;
-                        expect(res).to.have.status(400);
-                    });
-            });
-            it('Should reject users with password less than 5 characters', function () {
-                return chai
-                    .request(app)
-                    .post('/api/users')
-                    .send({
-                        username,
-                        password: '123',
-                        name,
-                        email
-                    })
-                    .then(() =>
-                        expect.fail(null, null, 'Request should not succeed')
-                    )
-                    .catch(err => {
-                        if (err instanceof chai.AssertionError) {
-                            throw err;
-                        }
-
-                        const res = err.response;
-                        expect(res).to.have.status(400);
-                        expect(res.body.error.details[0].message).to.equal(
-                            '"password" length must be at least 5 characters long');
-                    });
-            });
-            it('Should reject users with duplicate username', function () {
-                // Create an initial user
-                return User.create({
-                        username,
-                        password,
-                        name,
-                        email
-                    })
-                    .then(() =>
-                        // Try to create a second user with the same username
-                        chai.request(app).post('/api/users').send({
-                            username,
-                            password,
-                            name,
-                            email
-                        })
-                    )
-                    .then(() =>
-                        expect.fail(null, null, 'Request should not succeed')
-                    )
-                    .catch(err => {
-                        const res = err.response;
-                        expect(res).to.have.status(400);
-                        expect(res.body.error).to.equal(
-                            'Database Error: A user with that username and/or email already exists.'
-                        );
-                    });
-            });
-            it('Should create a new user', function () {
-                return chai
-                    .request(app)
-                    .post('/api/users')
-                    .send({
-                        username,
-                        password,
-                        name,
-                        email
-                    })
-                    .then(res => {
-                        expect(res).to.have.status(201);
-                        expect(res.body).to.be.an('object');
-                        expect(res.body).to.have.keys(
-                            'id',
-                            'username',
-                            'name',
-                            'email'
-                        );
-                        expect(res.body.username).to.equal(username);
-                        expect(res.body.name).to.equal(name);
-                        expect(res.body.email).to.equal(email);
-                        return User.findOne({
-                            username
-                        });
-                    })
-                    .then(user => {
-                        expect(user).to.not.be.null;
-                        expect(user.name).to.equal(name);
-                        expect(user.email).to.equal(email);
-                        return user.validatePassword(password);
-                    })
-                    .then(passwordIsCorrect => {
-                        expect(passwordIsCorrect).to.be.true;
-                    });
-            });
-        });
-
-        describe('GET', function () {
-            it('Should return an empty array initially', function () {
-                return chai.request(app).get('/api/users').then(res => {
-                    expect(res).to.have.status(200);
-                    expect(res.body).to.be.an('array');
-                    expect(res.body).to.have.length(0);
-                });
-            });
-            it('Should return an array of users', function () {
-                return User.create({
-                        username,
-                        password,
-                        name,
-                        email
-                    }, {
-                        username: usernameB,
-                        password: passwordB,
-                        name: nameB,
-                        email: emailB
-                    })
-                    .then(() => chai.request(app).get('/api/users'))
-                    .then(res => {
-                        expect(res).to.have.status(200);
-                        expect(res.body).to.be.an('array');
-                        expect(res.body).to.have.length(2);
-
-                        expect(res.body[0]).to.have.keys(
-                            'id',
-                            'username',
-                            'name',
-                            'email'
-                        );
-
-                        expect(res.body[1]).to.have.keys(
-                            'id',
-                            'username',
-                            'name',
-                            'email'
-                        );
-                    });
-            });
-        });
     });
+
+    it('Should create a new user', function () {
+        let newUser = createFakerUser();
+        return chai.request(app)
+            .post('/api/users')
+            .send(newUser)
+            .then(res => {
+                expect(res).to.have.status(HTTP_STATUS_CODES.CREATED);
+                expect(res).to.be.json;
+                expect(res).to.be.a('object');
+                expect(res.body).to.include.keys('id', 'name', 'username', 'email');
+                expect(res.body.name).to.equals(newUser.name);
+                expect(res.body.username).to.equals(newUser.username);
+            });
+    });
+
+    function createFakerUser() {
+        return {
+            name: `${faker.name.firstName()} ${faker.name.lastName()}`,
+            username: `${faker.lorem.word()}${faker.random.number(100)}`,
+            password: faker.internet.password(),
+            email: faker.internet.email()
+        };
+    }
 });

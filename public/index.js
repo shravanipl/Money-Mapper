@@ -220,6 +220,15 @@ $('.signout').click(function () {
 	toggleClasses();
 });
 
+
+
+$(function () {
+	$('#datepicker').datepicker(date());
+	$('#datepicker').datepicker('setDate', new Date());
+});
+
+
+
 function date() {
 	return {
 		dateFormat: 'dd-M-yy',
@@ -227,11 +236,6 @@ function date() {
 		changeMonth: true
 	};
 }
-
-$(function () {
-	$('#datepicker').datepicker(date());
-	$('#datepicker').datepicker('setDate', new Date());
-});
 
 function updateExpense() {
 	let token = localStorage.getItem('jwtToken');
@@ -309,6 +313,20 @@ function edit() {
 	});
 }
 
+$(function () {
+	$('#datepicker1').datepicker(date());
+});
+
+$(function () {
+	$('#datepicker2').datepicker({
+		dateFormat: 'dd-M-yy',
+		onSelect: function (day) {
+			$('.card2').hide();
+			getDailyExpense(day)
+		}
+	});
+});
+
 $('#main').on('click', '.js-edit', edit);
 
 $('.expenseForm').on('submit', addExpenseData());
@@ -374,19 +392,6 @@ function generateGraphReport(data) {
 	}
 }
 
-$(function () {
-	$('#datepicker1').datepicker(date);
-});
-
-$(function () {
-	$('#datepicker2').datepicker({
-		dateFormat: 'dd-M-yy',
-		onSelect: function (day) {
-			$('.card2').hide();
-			getDailyExpense(day)
-		}
-	});
-});
 
 function getTotalAmount(data, totalAmount) {
 	if (data.length === 1) {

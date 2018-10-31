@@ -23,7 +23,6 @@ expenseRouter.get('/', jwtPassportMiddleware, (request, response) => {
         })
         .populate('user')
         .then(expenses => {
-            console.log(expenses);
             return response.status(HTTP_STATUS_CODES.OK).json(expenses.map(expense => expense.serialize()));
         })
 });
@@ -64,7 +63,6 @@ expenseRouter.get('/totalExpenses', jwtPassportMiddleware, (request, response) =
 });
 
 expenseRouter.get('/groupExpense', jwtPassportMiddleware, (request, response) => {
-    console.log(request.user.id);
     Expense.aggregate([{
                 "$match": {
                     "user": mongoose.Types.ObjectId(request.user.id)
@@ -84,7 +82,6 @@ expenseRouter.get('/groupExpense', jwtPassportMiddleware, (request, response) =>
             }
         ])
         .then(expenses => {
-            console.log("expenses", expenses);
             return response.status(HTTP_STATUS_CODES.OK).json(expenses);
         })
         .catch(error => {
@@ -112,15 +109,12 @@ expenseRouter.post('/', jwtPassportMiddleware, (request, response) => {
 
      Expense.create(expense)
          .then(expense => {
-             console.log("get latest expense records");
-
               Expense.find({
                       user: request.user.id
                   })
                   .populate('user')
                   .then(expenses => {
                       const latestExpenses = expenses.map(expense => expense.serialize());
-                      console.log(latestExpenses);
                       return response.status(HTTP_STATUS_CODES.CREATED).json(latestExpenses);
                   })
                   .catch(error => {
@@ -131,7 +125,6 @@ expenseRouter.post('/', jwtPassportMiddleware, (request, response) => {
 
 
 expenseRouter.put('/:expenseid', jwtPassportMiddleware, (request, response) => {
-    console.log("put", request.body);
     const updatedExpense = {
         date: request.body.date,
         expenseInfo: request.body.expenseInfo,

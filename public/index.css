@@ -151,13 +151,12 @@ table th.r {
 	text-align: center;
 }
 
-@media screen and (max-width: 320px) {
+@media screen and (max-width: 440px) {
 
 	.expenses {
 		margin: 35px;
 		padding: 20px;
 	}
-
 	table {
 		display: block;
 	}
