@@ -2,7 +2,7 @@
 
 This is an Expense tracker application built using **HTML,CSS,Javascript,Node JS,D3.js, Mongoose, Mocha and Chai**
 
-This is the entry page where existing user need to enter the Username and Password
+Below is the entry page where existing user needs to enter the Username and Password given during Account Creation
 
 ![Scheme](assets/Login.JPG)
 
@@ -22,11 +22,11 @@ To **Edit** an expense, click on the Edit button, after which a pop up will be s
 
 ![Scheme](assets/Update.JPG)
 
-To **Delete** an expense, click on the Delete button and press Ok, if you want to delete the expense or cancel if you wish to retain the expense
+To **Delete** an expense, click on the Delete button and press **Ok**, if you want to delete the expense permanently or **Cancel** if you wish to retain the expense
 
 ![Scheme](assets/Delete.JPG)
 
-On click of **Graph** tab, there are 3 more tabs under it -  **Monthly, Daily and Stats**
+On click of **Graph** tab, there are 3 tabs visible -  **Monthly, Daily and Stats**
 
 **Monthly Tab**
 
@@ -46,7 +46,7 @@ This tab displays Donut chart for overall expenses incurred for the year till da
 
 ![Scheme](assets/Stats.png)
 
-Finally if you wish to Sign out, click the **SignOut** button, in the **Home page**
+Finally, if you wish to Sign out, click the **SignOut** button, in the **Home page**
 
 
 
