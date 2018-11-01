@@ -52,8 +52,10 @@ Finally, if you wish to Sign out, click the **SignOut** button, in the **Home pa
 For live demo click the below link,
 
 https://mighty-taiga-10203.herokuapp.com/
+
 **Demo user credentials**
+
 Username: test1
-Passowrd:test1
+Password:test1
 
 
