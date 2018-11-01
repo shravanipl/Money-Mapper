@@ -126,10 +126,19 @@ function addExpenseData() {
 			category: $('#category option:selected').text(),
 			amount: $('.amount').val()
 		};
-		console.log(expenseInfo);
+
+		
 
 		saveExpenseData(expenseInfo, refreshExpenseGrid);
+		formReset();
 	};
+}
+
+function formReset() {
+	$('.date').val('');
+	$('.info').val('');
+	$('#category').val('');
+	$('.amount').val('');
 }
 
 function saveExpenseData(expenseInfo, callback) {

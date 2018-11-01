@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const morgan = require('morgan');
 const passport = require('passport');
+const joi = require('joi');
 
 const {
     PORT,
@@ -22,7 +23,6 @@ const {
     localStrategy,
     jwtStrategy
 } = require('./auth/strategies');
-
 const app = express();
 let server;
 passport.use(localStrategy);
@@ -53,7 +53,8 @@ function startServer(testEnv) {
         let mongourl;
         if (testEnv) {
             mongourl = TEST_MONGO_URL;
-        } else mongourl = MONGO_URL;
+        }
+        else { mongourl = MONGO_URL; }
         mongoose.connect(
             mongourl, {
                 useNewUrlParser: true,
