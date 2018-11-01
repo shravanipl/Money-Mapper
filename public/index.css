@@ -151,12 +151,26 @@ table th.r {
 	text-align: center;
 }
 
-@media screen and (max-width: 440px) {
+@media screen and (max-width: 1024px) {
 
 	.expenses {
 		margin: 35px;
 		padding: 20px;
+		display: block;
 	}
+
+	.monthlyInfo,
+	.dailyInfo,
+	.totalInfo {
+		display: flex;
+		width: fit-content;
+	}
+
+	.barGraph {
+		display: flex;
+		float: left;
+	}
+	
 	table {
 		display: block;
 	}
