@@ -4,7 +4,7 @@ This is an Expense tracker application built using **HTML,CSS,Javascript,Node JS
 
 This is the entry page where existing user need to enter the Username and Password
 
-![Scheme](assets/Login.jpg)
+![Scheme](assets/Login.JPG)
 
 For new user, click on the link **Click to create new account** which returns the below page
 
